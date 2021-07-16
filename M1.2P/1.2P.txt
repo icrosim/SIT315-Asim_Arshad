@@ -1,1 +1,22 @@
-asdasd
+
+int RED = 13;            //LED
+int PIR = 2;			//Sensor 
+volatile bool state = false;		//Inital State
+void setup() {
+  //Initalizing LED and Sensor
+  Serial.begin(9600);
+  pinMode(RED, OUTPUT);      
+  pinMode(PIR, INPUT);    
+  attachInterrupt(digitalPinToInterrupt(PIR),LEDstate,CHANGE);
+
+}
+
+void loop(){ delay(1000);
+  
+}
+void LEDstate()
+{	
+    state = !state;
+    digitalWrite(RED,state);
+  Serial.println("Motion Detected");
+}
