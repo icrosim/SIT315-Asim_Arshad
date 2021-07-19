@@ -1,1 +1,34 @@
-...
+
+int RED = 13;            //LED
+int PIR = 2;			//Motion Snesor
+int tilt = 3;	//TiltSensor 
+int Yellow= 7;
+volatile bool state = false;	//Inital State
+volatile bool state2 = false;
+void setup() {
+  //Initalizing LED and Sensor
+  Serial.begin(9600);
+  pinMode(RED, OUTPUT);
+  pinMode(Yellow, OUTPUT);   
+  pinMode(PIR, INPUT);    
+  pinMode(tilt, INPUT);
+  attachInterrupt(digitalPinToInterrupt(PIR),REDstate,CHANGE);
+  attachInterrupt(digitalPinToInterrupt(tilt), Yellowstate, HIGH);
+
+}
+
+void loop(){ delay(1000);
+  
+}
+void REDstate()
+{	
+    state = !state;
+    digitalWrite(RED,state);
+  Serial.println("Motion Detected");
+}
+void Yellowstate(){
+  state2 = !state2;
+  digitalWrite(Yellow, state2);
+  Serial.println("Tilted");
+  
+}
