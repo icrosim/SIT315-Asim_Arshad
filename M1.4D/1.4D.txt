@@ -1,0 +1,68 @@
+const int timer_blue = PB4;
+const int t1_load = 0;
+const int t1_comp = 31250;
+int RED = 5;            //LED
+int PIR = 2;			//Motion Snesor
+int tilt = 3;	//TiltSensor 
+int tilt2 = 8;
+int Yellow= 7;
+int Green = 6;
+void setup() {
+  //Initalizing LED and Sensor
+  Serial.begin(9600);
+  //Initiating LEDS
+  DDRB |=(1<<timer_blue);
+  DDRD |= (1<<RED);
+  DDRD |= (1<<Yellow);
+  DDRD |= (1<<Green);
+  //Initalizing Sensors
+  DDRD &= ~(1<<PIR);
+  PORTD |= (1<<PIR);   
+  DDRD &= ~(1<<tilt);
+  PORTD |= (1<<tilt);
+  DDRB &= ~(1<<tilt2);
+  PORTB |= (1<<tilt2);
+  //Interrupt for 3rd Sensor
+  PCICR |= B00000001;
+  PCMSK0 |= B00000001;
+  // Interrupts based on Hardware pins
+  attachInterrupt(digitalPinToInterrupt(PIR),REDstate,CHANGE);
+  attachInterrupt(digitalPinToInterrupt(tilt), Yellowstate, HIGH);
+  //Timer Interrupt
+  TCCR1A = 0;
+  TCCR1B |= (1 << CS12);
+  TCCR1B &= ~(1 << CS11);
+  TCCR1B &= ~(1 << CS10);
+  TCNT1 = t1_load;
+  OCR1A = t1_comp;
+
+  TIMSK1 = (1 << OCIE1A);
+
+  sei();
+}
+//LED for tilt sensor 3
+ISR(PCINT0_vect){
+  PORTD ^= (1<<Green);
+  Serial.println("Tilted");
+}
+// LED for timer
+ISR(TIMER1_COMPA_vect) {
+  TCNT1 = t1_load;
+  PORTB ^= (1 << timer_blue);
+}
+
+void loop(){ delay(500);
+  
+}
+//LED for motion Sensor
+void REDstate()
+{	
+    PORTD ^= (1<<RED);
+    Serial.println("Motion Detected");
+}
+//LED for Tilt sensor 1
+void Yellowstate(){
+  PORTD ^= (1<<Yellow);
+  Serial.println("Tilted");
+  
+}
